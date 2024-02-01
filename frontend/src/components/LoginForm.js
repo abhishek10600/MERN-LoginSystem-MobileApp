@@ -1,19 +1,63 @@
-import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
+import React, { useState } from 'react'
+import axios from "axios";
 
 const LoginForm = () => {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const handleEmail = (e) => {
+        const emailVar = e.nativeEvent.text;
+        setEmail(emailVar);
+    }
+    const handlePassword = (e) => {
+        const passwordVar = e.nativeEvent.text;
+        setPassword(passwordVar);
+    }
+    const login = async () => {
+        if (email !== "" && password !== "") {
+            try {
+                setLoading(true);
+                const res = await axios.post("http://192.168.29.156:4000/api/v1/users/login", {
+                    email,
+                    password
+                })
+                if (res.data.success === true) {
+                    setEmail("");
+                    setPassword("");
+                    Alert.alert("Logged in successfully.")
+                }
+            } catch (error) {
+                console.log(error.message);
+            }
+        } else {
+            Alert.alert("Enter all the required fields");
+        }
+        setLoading(false);
+    }
     return (
         <View style={styles.container}>
             <View style={{ marginVertical: 20 }}>
                 <Text style={styles.inputLabelStyle}>Email</Text>
-                <TextInput placeholder="Enter email" style={styles.textInputStyle} />
+                <TextInput
+                    placeholder="Enter email"
+                    style={styles.textInputStyle}
+                    value={email}
+                    onChange={e => handleEmail(e)}
+                />
             </View>
             <View>
                 <Text style={styles.inputLabelStyle}>Passwrod</Text>
-                <TextInput secureTextEntry={true} placeholder="Enter email" style={styles.textInputStyle} />
+                <TextInput
+                    secureTextEntry={true}
+                    placeholder="Enter email"
+                    style={styles.textInputStyle}
+                    value={password}
+                    onChange={e => handlePassword(e)}
+                />
             </View>
-            <TouchableOpacity style={styles.inputButtonStyle}>
-                <Text style={styles.inputButtonTextStyle}>Login</Text>
+            <TouchableOpacity style={styles.inputButtonStyle} onPress={login}>
+                <Text style={styles.inputButtonTextStyle}>{loading ? (<ActivityIndicator size="small" color="white" />) : "Login"}</Text>
             </TouchableOpacity>
         </View>
     )

@@ -5,6 +5,7 @@ import FormSelectorButton from './src/components/FormSelectorButton';
 import LoginForm from './src/components/LoginForm';
 import SignupForm from './src/components/SignupForm';
 import { useRef } from 'react';
+import ProfilePicUploadScreen from './src/screens/ProfilePicUploadScreen';
 
 const screenWidth = Dimensions.get("window").width
 
@@ -25,43 +26,44 @@ export default function App() {
   })
 
   return (
-    <View style={{
-      flex: 1,
-      paddingTop: 90
-    }}>
-      <View style={{ height: 90 }}>
-        <FormHeader
-          title={"Task-O-fy"}
-          subHeading={"Your Task Manager"}
-        />
-      </View>
-      <View style={
-        {
-          flexDirection: "row",
-          paddingHorizontal: 20
-        }}>
-        <FormSelectorButton
-          onPressProp={() => scrollView.current.scrollTo({ x: 0 })}
-          title={"Login"}
-          borderStyle={styles.borderLeft}
-          backgroundColor={loginColorInterpolate} />
-        <FormSelectorButton
-          onPressProp={() => scrollView.current.scrollTo({ x: screenWidth })}
-          title={"Signup"}
-          borderStyle={styles.borderRight}
-          backgroundColor={signupColorInterpolate} />
-      </View>
-      <ScrollView
-        ref={scrollView}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        scrollEventThrottle={16}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: animation } } }], { useNativeDriver: false })}>
-        <LoginForm />
-        <SignupForm />
-      </ScrollView>
-    </View>
+    <ProfilePicUploadScreen />
+    // <View style={{
+    //   flex: 1,
+    //   paddingTop: 90
+    // }}>
+    //   <View style={{ height: 90 }}>
+    //     <FormHeader
+    //       title={"Task-O-fy"}
+    //       subHeading={"Your Task Manager"}
+    //     />
+    //   </View>
+    //   <View style={
+    //     {
+    //       flexDirection: "row",
+    //       paddingHorizontal: 20
+    //     }}>
+    //     <FormSelectorButton
+    //       onPressProp={() => scrollView.current.scrollTo({ x: 0 })}
+    //       title={"Login"}
+    //       borderStyle={styles.borderLeft}
+    //       backgroundColor={loginColorInterpolate} />
+    //     <FormSelectorButton
+    //       onPressProp={() => scrollView.current.scrollTo({ x: screenWidth })}
+    //       title={"Signup"}
+    //       borderStyle={styles.borderRight}
+    //       backgroundColor={signupColorInterpolate} />
+    //   </View>
+    //   <ScrollView
+    //     ref={scrollView}
+    //     horizontal
+    //     pagingEnabled
+    //     showsHorizontalScrollIndicator={false}
+    //     scrollEventThrottle={16}
+    //     onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: animation } } }], { useNativeDriver: false })}>
+    //     <LoginForm />
+    //     <SignupForm />
+    //   </ScrollView>
+    // </View>
   );
 }
 
