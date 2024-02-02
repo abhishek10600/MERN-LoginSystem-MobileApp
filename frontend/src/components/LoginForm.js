@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
+import { StackActions } from '@react-navigation/native';
 import axios from "axios";
 
-const LoginForm = () => {
+const LoginForm = ({ navigation }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -23,9 +24,16 @@ const LoginForm = () => {
                     password
                 })
                 if (res.data.success === true) {
+                    const userToken = res.data.token;
                     setEmail("");
                     setPassword("");
                     Alert.alert("Logged in successfully.")
+                    navigation.dispatch(
+                        StackActions.replace("UserProfileScreen", {
+                            token: userToken
+                        })
+                    )
+
                 }
             } catch (error) {
                 console.log(error.message);

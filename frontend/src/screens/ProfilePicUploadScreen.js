@@ -1,9 +1,13 @@
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Image, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
+import { StackActions } from '@react-navigation/native';
 import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 
-const ProfilePicUploadScreen = () => {
+const ProfilePicUploadScreen = ({ navigation, route }) => {
     const [profilePic, setProfilePic] = useState("");
+    const [loading, setLoading] = useState(false);
+    const { token } = route.params;
 
     const openPhoneGallery = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -26,19 +30,45 @@ const ProfilePicUploadScreen = () => {
         }
     }
 
-    const uploadProfilePic = () => {
-
+    const uploadProfilePic = async () => {
+        const formData = new FormData();
+        formData.append("profile", {
+            name: new Date() + "_profile",
+            uri: profilePic,
+            type: "image/jpg" || "image/png" || "image/jpeg" || "image/webp"
+        });
+        try {
+            setLoading(true);
+            const res = await axios.put("http://192.168.29.156:4000/api/v1/users/setProfilePhoto", formData, {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `JWT ${token}`
+                }
+            })
+            if (res.data.success === true) {
+                Alert.alert("Profile pic added successfully.")
+                navigation.dispatch(
+                    StackActions.replace("UserProfileScreen")
+                )
+            } else {
+                console.log("Some error.")
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+        setLoading(false);
     }
     return (
         <View style={styles.container}>
             <View style={styles.subContainer}>
                 <TouchableOpacity onPress={openPhoneGallery} style={styles.uploadBtn}>
-                    <Text style={styles.uploadBtnTextStyle}>upload profile image</Text>
+                    {profilePic ? <Image source={{ uri: profilePic }} style={{ width: "100%", height: "100%" }} /> : <Text style={styles.uploadBtnTextStyle}>upload profile image</Text>}
                 </TouchableOpacity>
                 <TouchableOpacity>
                     <Text style={{ textAlign: "center", fontSize: 16, color: "#3a98f7" }}>Skip</Text>
                 </TouchableOpacity>
-                {profilePic ? <Text onPress={uploadProfilePic} style={styles.uploadButton}>Upload</Text> : null}
+                {profilePic ? <Text onPress={uploadProfilePic} style={styles.uploadButton}>{loading ? <ActivityIndicator color="black" /> : "Upload"}</Text> : null}
             </View>
         </View>
     )
@@ -62,7 +92,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderStyle: "dashed",
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        overflow: "hidden"
     },
     uploadBtnTextStyle: {
         textAlign: "center",

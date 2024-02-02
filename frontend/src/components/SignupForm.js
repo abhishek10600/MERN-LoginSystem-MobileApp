@@ -1,10 +1,11 @@
 import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { Formik } from "formik";
+import { StackActions } from '@react-navigation/native';
 import { userValidationSchema } from '../validations/userValidation';
 import axios from "axios";
 
-const SignupForm = () => {
+const SignupForm = ({ navigation }) => {
     const userInfo = {
         name: "",
         email: "",
@@ -16,8 +17,15 @@ const SignupForm = () => {
         try {
             const res = await axios.post("http://192.168.29.156:4000/api/v1/users/register", values)
             if (res.data.success === true) {
+                const userToken = res.data.token;
+                console.log(userToken);
                 Alert.alert("Account created successfully.")
                 formikActions.resetForm();
+                navigation.dispatch(
+                    StackActions.replace("ProfilePicUploadScreen", {
+                        token: userToken
+                    })
+                )
             }
         } catch (error) {
             console.log(error);

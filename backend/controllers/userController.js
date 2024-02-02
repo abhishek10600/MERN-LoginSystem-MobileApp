@@ -24,11 +24,7 @@ export const registerUser = async (req, res, next) => {
             email,
             password
         })
-        user.password = undefined;
-        res.status(201).json({
-            success: true,
-            user
-        })
+        createToken(res, user);
     } catch (error) {
         return res.json({
             success: false,
