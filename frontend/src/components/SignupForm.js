@@ -1,11 +1,14 @@
 import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator } from 'react-native'
-import React from 'react'
+import React, { useContext } from 'react'
 import { Formik } from "formik";
 import { StackActions } from '@react-navigation/native';
 import { userValidationSchema } from '../validations/userValidation';
 import axios from "axios";
+import { LoginContext } from '../context/LoginProvider';
 
 const SignupForm = ({ navigation }) => {
+    const { setIsLoggedIn } = useContext(LoginContext);
+    const { setUser } = useContext(LoginContext);
     const userInfo = {
         name: "",
         email: "",
@@ -19,6 +22,8 @@ const SignupForm = ({ navigation }) => {
             if (res.data.success === true) {
                 const userToken = res.data.token;
                 console.log(userToken);
+                setIsLoggedIn(true)
+                setUser(res.data.user);
                 Alert.alert("Account created successfully.")
                 formikActions.resetForm();
                 navigation.dispatch(

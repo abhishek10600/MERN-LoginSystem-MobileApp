@@ -1,12 +1,15 @@
 import { View, Text, StyleSheet, Dimensions, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { StackActions } from '@react-navigation/native';
 import axios from "axios";
+import { LoginContext } from '../context/LoginProvider';
 
 const LoginForm = ({ navigation }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const { setIsLoggedIn } = useContext(LoginContext);
+    const { setUser } = useContext(LoginContext);
     const handleEmail = (e) => {
         const emailVar = e.nativeEvent.text;
         setEmail(emailVar);
@@ -27,6 +30,8 @@ const LoginForm = ({ navigation }) => {
                     const userToken = res.data.token;
                     setEmail("");
                     setPassword("");
+                    setIsLoggedIn(true)
+                    setUser(res.data.user);
                     Alert.alert("Logged in successfully.")
                     navigation.dispatch(
                         StackActions.replace("UserProfileScreen", {
