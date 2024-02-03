@@ -1,13 +1,16 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Image, ActivityIndicator } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { StackActions } from '@react-navigation/native';
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
+import { LoginContext } from '../context/LoginProvider';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfilePicUploadScreen = ({ navigation, route }) => {
+    const { setIsLoggedIn, setUser } = useContext(LoginContext);
     const [profilePic, setProfilePic] = useState("");
     const [loading, setLoading] = useState(false);
-    const { token } = route.params;
+    // const { token } = route.params;
 
     const openPhoneGallery = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -39,6 +42,7 @@ const ProfilePicUploadScreen = ({ navigation, route }) => {
         });
         try {
             setLoading(true);
+            const token = await AsyncStorage.getItem("token");
             const res = await axios.put("http://192.168.29.156:4000/api/v1/users/setProfilePhoto", formData, {
                 headers: {
                     Accept: "application/json",
@@ -47,9 +51,11 @@ const ProfilePicUploadScreen = ({ navigation, route }) => {
                 }
             })
             if (res.data.success === true) {
+                setUser(res.data.user);
+                setIsLoggedIn(true);
                 Alert.alert("Profile pic added successfully.")
                 navigation.dispatch(
-                    StackActions.replace("UserProfileScreen")
+                    StackActions.replace("HomeScreen")
                 )
             } else {
                 console.log("Some error.")

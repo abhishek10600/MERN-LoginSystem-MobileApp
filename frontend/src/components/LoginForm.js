@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react'
 import { StackActions } from '@react-navigation/native';
 import axios from "axios";
 import { LoginContext } from '../context/LoginProvider';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginForm = ({ navigation }) => {
     const [email, setEmail] = useState("");
@@ -28,13 +29,14 @@ const LoginForm = ({ navigation }) => {
                 })
                 if (res.data.success === true) {
                     const userToken = res.data.token;
+                    await AsyncStorage.setItem("token", userToken);
                     setEmail("");
                     setPassword("");
                     setIsLoggedIn(true)
                     setUser(res.data.user);
                     Alert.alert("Logged in successfully.")
                     navigation.dispatch(
-                        StackActions.replace("UserProfileScreen", {
+                        StackActions.replace("HomeScreen", {
                             token: userToken
                         })
                     )

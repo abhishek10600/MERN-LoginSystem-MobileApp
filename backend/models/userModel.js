@@ -25,7 +25,12 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String
-        }
+        },
+        token: [
+            {
+                type: Object
+            }
+        ]
     },
     {
         timestamps: true

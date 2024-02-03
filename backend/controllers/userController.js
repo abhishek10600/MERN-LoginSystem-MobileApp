@@ -36,7 +36,6 @@ export const registerUser = async (req, res, next) => {
 export const loginUser = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        console.log({ email, password });
         if (!email || !password) {
             return res.json({
                 success: false,
@@ -66,18 +65,50 @@ export const loginUser = async (req, res, next) => {
     }
 }
 
+export const logoutUser = async (req, res, next) => {
+    try {
+        if (req.headers && req.headers.authorization) {
+            const token = req.headers.authorization.split(" ")[1];
+            const userId = req.user._id;
+            if (!token) {
+                return res.status(401).json({
+                    success: false,
+                    message: "Authorization failed."
+                })
+            }
+            const setToken = []
+            await User.findByIdAndUpdate(userId, { token: setToken })
+            res.json({
+                success: true,
+                message: "Logout successful."
+            })
+        }
+    } catch (error) {
+        res.json({
+            success: false,
+            message: error.message
+        })
+    }
+}
+
 export const setProfilePhoto = async (req, res, next) => {
     try {
         const { user } = req;
+        const userId = user._id;
         const result = await cloudinary.uploader.upload(req.file.path, {
             folder: "mobileloginsystem/user"
         })
-        user.photo.public_id = result.public_id;
-        user.photo.secure_url = result.secure_url;
-        user.save();
+        const photo = {
+            public_id: result.public_id,
+            secure_url: result.secure_url
+        }
+        await User.findByIdAndUpdate(userId, { photo })
+        const updatedUser = await User.findById(userId);
+        user.password = undefined;
         res.status(200).json({
             success: true,
-            message: "Profile photo set."
+            message: "Profile photo set.",
+            user: updatedUser
         });
     } catch (error) {
         res.status(500).json({
@@ -85,4 +116,19 @@ export const setProfilePhoto = async (req, res, next) => {
             message: error.message
         })
     }
+}
+
+export const getProfile = async (req, res, next) => {
+    const { user } = req;
+    if (!user) {
+        return res.json({
+            success: true,
+            message: "Unauthorized Access."
+        })
+    }
+    user.password = undefined;
+    res.json({
+        success: true,
+        user
+    })
 }

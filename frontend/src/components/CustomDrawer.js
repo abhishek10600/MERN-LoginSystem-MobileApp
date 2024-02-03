@@ -1,14 +1,31 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native'
 import React, { useContext } from 'react'
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { LoginContext } from '../context/LoginProvider';
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import axios from "axios";
 
 const CustomDrawer = (props) => {
+    const navigation = props.navigation;
     const { setIsLoggedIn } = useContext(LoginContext);
     const { user } = useContext(LoginContext);
 
-    const handleLogout = () => {
-        setIsLoggedIn(false);
+    const handleLogout = async () => {
+        try {
+            const token = await AsyncStorage.getItem("token");
+            const res = await axios.get("http://192.168.29.156:4000/api/v1/users/logout", {
+                headers: {
+                    Authorization: `JWT ${token}`
+                }
+            });
+            if (res.data.success === true) {
+                await AsyncStorage.removeItem("token");
+                Alert.alert("Logged out successfully");
+                setIsLoggedIn(false);
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
     }
 
     return (

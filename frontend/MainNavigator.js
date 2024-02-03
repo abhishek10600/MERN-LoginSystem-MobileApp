@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import StackNavigator from './StackNavigator';
-import { LoginContext } from './src/context/LoginProvider';
 import DrawerNavigator from './DrawerNavigator';
+import { LoginContext } from './src/context/LoginProvider';
 
 
 const MainNavigator = () => {

@@ -5,9 +5,9 @@ import { StackActions } from '@react-navigation/native';
 import { userValidationSchema } from '../validations/userValidation';
 import axios from "axios";
 import { LoginContext } from '../context/LoginProvider';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SignupForm = ({ navigation }) => {
-    const { setIsLoggedIn } = useContext(LoginContext);
     const { setUser } = useContext(LoginContext);
     const userInfo = {
         name: "",
@@ -21,20 +21,18 @@ const SignupForm = ({ navigation }) => {
             const res = await axios.post("http://192.168.29.156:4000/api/v1/users/register", values)
             if (res.data.success === true) {
                 const userToken = res.data.token;
-                console.log(userToken);
-                setIsLoggedIn(true)
+                await AsyncStorage.setItem("token", userToken);
                 setUser(res.data.user);
                 Alert.alert("Account created successfully.")
                 formikActions.resetForm();
                 navigation.dispatch(
-                    StackActions.replace("ProfilePicUploadScreen", {
-                        token: userToken
-                    })
+                    StackActions.replace("ProfilePicUploadScreen")
                 )
             }
         } catch (error) {
             console.log(error);
         }
+
         formikActions.setSubmitting(false);
     }
     return (
